@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {
   CAvatar,
   CDropdown,
@@ -12,8 +12,26 @@ import { cilAccountLogout, cilLockUnlocked, cilUser } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
 
 import avatar8 from './../../assets/images/avatars/8.jpg'
+import { logout } from 'src/app/actions/auth'
+import { authDetail } from 'src/app/services/auth'
+import { useNavigate } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
 
 const AppHeaderDropdown = () => {
+  
+  const dispatch = useDispatch();
+  let navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const role = authDetail()?.role;
+  const handleLogout=(e)=>{
+    dispatch(logout()).then(() => {
+      navigate("/"+role+"/login");
+      window.location.reload();
+    })
+    .catch((error) => {
+      setLoading(false);
+    });
+  }
   return (
     <CDropdown variant="nav-item">
       <CDropdownToggle placement="bottom-end" className="py-0" caret={false}>
@@ -30,9 +48,12 @@ const AppHeaderDropdown = () => {
           Change Password
         </CDropdownItem>
         <CDropdownDivider />
-        <CDropdownItem href="#">
+        <CDropdownItem type='button'  onClick={handleLogout}>
           <CIcon icon={cilAccountLogout} className="me-2" />
-          Log Out
+          {loading && (
+                          <span className="spinner-border spinner-border-sm"></span>
+                        )}
+                        < span> Logout</span>
         </CDropdownItem>
       </CDropdownMenu>
     </CDropdown>
